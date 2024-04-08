@@ -1,0 +1,11 @@
+{
+  "name": "can-of-books-backend",
+  "version": "1.0.0",
+  "description": "API for Books",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vivian Davila, Adam Jimenez",
+  "license": "ISC"
+}
