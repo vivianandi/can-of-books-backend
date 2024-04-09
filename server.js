@@ -8,7 +8,9 @@ const mongoose = require('mongoose');
 const Books = require('./models/books');
 
 
+
 const app = express();
+
 
 
 app.use(cors());
@@ -68,15 +70,20 @@ async function emptyDatabase(request, response) {
     response.status(500).json({ message: error.message });
   }
 
+
 }
+
 
 
 // Connect to the database and start the server
 function startServer() {
   const PORT = process.env.PORT || 3000;
   const DATABASE_URL = process.env.DATABASE_URL;
+
   console.log(DATABASE_URL);
   mongoose.connect(DATABASE_URL)
+
+
     .then(() => {
       app.listen(PORT, () => {
         console.log(`Server started on port ${PORT}`);
@@ -89,6 +96,3 @@ function startServer() {
 
 
 startServer();
-
-
-
