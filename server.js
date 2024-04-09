@@ -2,25 +2,45 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+
 const app = express();
 const port = process.env.PORT || 3000;
-
 
 // Use CORS middleware
 app.use(cors());
 
-// Endpoint to 
-app.get('/this is endpoint', async (req, res) => {
-    const { city } = req.query;
-    if (!city) {
-      return res.status(400).json({ message: 'Please provide a parameter.' });
-    }
-    try {
-      const weatherData = await fetchWeatherData(city);
-      const forecasts = .map();
-      res.status(200).json();
-    } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  });
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error(err));
+
+// Define your mongoose schema and model if needed
+
+
+
+
+
+
+
+
+
+
+// // Define your endpoint
+// app.get('/books', (req, res) => {
+//     res.json({ message: 'This is the homepage' });
+// });
+
+// // Handle all other routes
+// app.get('*', (req, res) => {
+//     res.status(404).json({ message: 'Not Found' });
+// });
+
+// // Error handler middleware
+// app.use((err, req, res, next) => {
+//     console.error(err.stack);
+//     res.status(500).json({ message: 'Something went wrong!' });
+// });
+
+// app.listen(port, () => {
+// console.log(`Server is running on port ${port}`);
+// });
