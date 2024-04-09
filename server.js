@@ -1,34 +1,42 @@
 'use strict';
 
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Books = require('./models/books');
 
+
 const app = express();
 
+
 app.use(cors());
+
 
 // Handle the default route
 app.get('/', (request, response) => {
   response.json({ message: 'This is the book server' });
 });
 
+
 app.get('/books', handleGetBooks);
 app.get('/books/seed', seedDatabase);
 app.get('/books/nuke', emptyDatabase);
+
 
 // Handle all unknown routes
 app.get('*', (request, response) => {
   response.status(404).json({ message: 'Not Found' });
 });
 
+
 // Handle all errors
 app.use((error, request, response) => {
   console.error(error);
   response.status(500).json({ message: 'Internal Server Error' });
 });
+
 
 // Route Handlers
 async function handleGetBooks(request, response) {
@@ -41,6 +49,7 @@ async function handleGetBooks(request, response) {
   }
 }
 
+
 async function seedDatabase(request, response) {
   try {
     let results = await Books.seed();
@@ -50,6 +59,7 @@ async function seedDatabase(request, response) {
   }
 }
 
+
 async function emptyDatabase(request, response) {
   try {
     let results = await Books.clear();
@@ -57,7 +67,9 @@ async function emptyDatabase(request, response) {
   } catch (error) {
     response.status(500).json({ message: error.message });
   }
+
 }
+
 
 // Connect to the database and start the server
 function startServer() {
@@ -75,4 +87,8 @@ function startServer() {
     });
 }
 
+
 startServer();
+
+
+

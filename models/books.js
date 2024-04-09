@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 // Define the schema for book
 const bookSchema = new mongoose.Schema({
   title: String,
@@ -10,6 +11,7 @@ const bookSchema = new mongoose.Schema({
     default: 'available'
   }
 });
+
 
 // Define static methods for seeding and clearing the database
 bookSchema.statics.seed = async function () {
@@ -39,8 +41,10 @@ bookSchema.statics.seed = async function () {
   }
 };
 
+
 // Define the Book model using the schema
 const Book = mongoose.model('Book', bookSchema);
+
 
 // Export the Book model
 module.exports = Book;
