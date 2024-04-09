@@ -6,7 +6,10 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const Books = require('./models/books');
 
-const app = express();
+
+const port = process.env.PORT || 3000;
+const Book = require('./models/books');
+
 
 app.use(cors());
 
@@ -59,10 +62,27 @@ async function emptyDatabase(request, response) {
   }
 }
 
+
+// Define the /books route
+app.get('/books', async (req, res) => {
+  try {
+    // Retrieve all books from the database
+    const books = await Book.find({});
+    // Return the books as JSON in the response object
+    res.json(books);
+  } catch (error) {
+    // If an error occurs, send a 500 status code and the error message
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
 // Connect to the database and start the server
 function startServer() {
   const PORT = process.env.PORT || 3000;
   const DATABASE_URL = process.env.DATABASE_URL;
+
   mongoose.connect(DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
       app.listen(PORT, () => {
@@ -75,3 +95,6 @@ function startServer() {
 }
 
 startServer();
+
+
+
