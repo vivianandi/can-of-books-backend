@@ -25,6 +25,8 @@ app.get('/books/nuke', emptyDatabase);
 //Route handler - POST - creates a new book
 app.post('/books', handleCreateBook);
 
+//RH - delete
+app.delete('/books/:id', handleDeleteBook);
 
 // Handle all unknown routes
 app.get('*', (request, response) => {
@@ -93,6 +95,31 @@ async function handleCreateBook(request, response) {
   }
 }
 
+async function handleDeleteBook(request, response) {
+  try {
+    // Extract the book ID from the request parameters
+    const { id } = request.params;
+
+    // Check if the ID is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return response.status(400).json({ message: 'Invalid book ID' });
+    }
+
+    // Find the book by ID and delete it from the database
+    const deletedBook = await Books.findByIdAndDelete(id);
+
+    // If the book was not found, return a 404 response
+    if (!deletedBook) {
+      return response.status(404).json({ message: 'Book not found' });
+    }
+
+    // Return a success message
+    response.json({ message: 'Book deleted successfully' });
+  } catch (error) {
+    // Handle errors
+    response.status(500).json({ message: error.message });
+  }
+}
 
 // Connect to the database and start the server
 function startServer() {
