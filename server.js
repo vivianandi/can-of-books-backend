@@ -63,7 +63,8 @@ async function emptyDatabase(request, response) {
 function startServer() {
   const PORT = process.env.PORT || 3000;
   const DATABASE_URL = process.env.DATABASE_URL;
-  mongoose.connect(DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+  console.log(DATABASE_URL);
+  mongoose.connect(DATABASE_URL)
     .then(() => {
       app.listen(PORT, () => {
         console.log(`Server started on port ${PORT}`);
