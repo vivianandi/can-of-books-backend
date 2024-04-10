@@ -110,7 +110,7 @@ async function handleDeleteBook(request, response) {
 
     // If the book was not found, return a 404 response
     if (!deletedBook) {
-      return response.status(404).json({ message: 'Book not found' });
+      return response.status(400).json({ message: 'Book not found' });
     }
 
     // Return a success message
