@@ -42,18 +42,14 @@ app.use((error, request, response) => {
 //Handle PUT
 app.put('/books/:id', async (req, res) => {
   try {
-    // Extract book ID from request parameters
     const { id } = req.params;
 
-    // Check if the ID is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid book ID' });
     }
 
-    // Update the book details in the database
     const updatedBook = await Books.findByIdAndUpdate(id, req.body, { new: true });
 
-    // If the book was not found, return a 404 response
     if (!updatedBook) {
       return res.status(404).json({ message: 'Book not found' });
     }
@@ -66,10 +62,8 @@ app.put('/books/:id', async (req, res) => {
   }
 });
 
-// Route Handlers
 async function handleGetBooks(request, response) {
   try {
-    // Get all the books from the database
     const books = await Books.find({});
     response.json(books);
   } catch (error) {
@@ -95,25 +89,22 @@ async function emptyDatabase(request, response) {
   }
 }
 
-
 //takes book data from the client request (title, desc..), create book in the database, sends resp of book or error
 async function handleCreateBook(request, response) {
   console.log(request);
   console.log('response', response);
   try {
-    // Check if request body is empty or doesn't contain required fields
+
     if (!request.body || !request.body.title || !request.body.description) {
       return response.status(400).json({ message: 'Title and description are required in the request body' });
     }
 
-    // Extract book data from request body
     const { title, description } = request.body;
 
-    // Create a new book in the database
     const newBook = await Books.create({
       title,
       description,
-      status: 'available' // Assuming default status is 'available'
+      status: 'available'
     });
 
     response.status(200).json(newBook);
@@ -124,31 +115,24 @@ async function handleCreateBook(request, response) {
 
 async function handleDeleteBook(request, response) {
   try {
-    // Extract the book ID from the request parameters
     const { id } = request.params;
 
-    // Check if the ID is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return response.status(400).json({ message: 'Invalid book ID' });
     }
 
-    // Find the book by ID and delete it from the database
     const deletedBook = await Books.findByIdAndDelete(id);
 
-    // If the book was not found, return a 404 response
     if (!deletedBook) {
       return response.status(400).json({ message: 'Book not found' });
     }
 
-    // Return a success message
     response.json({ message: 'Book deleted successfully' });
   } catch (error) {
-    // Handle errors
     response.status(500).json({ message: error.message });
   }
 }
 
-// Connect to the database and start the server
 function startServer() {
   const PORT = process.env.PORT || 3000;
   const DATABASE_URL = process.env.DATABASE_URL;

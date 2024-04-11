@@ -11,12 +11,10 @@ const bookSchema = new mongoose.Schema({
   }
 });
 
-
-// Define static methods for seeding and clearing the database
 bookSchema.statics.seed = async function () {
   try {
-    const Book = mongoose.model('Book'); // Define Book after it's defined
-    await Book.deleteMany({}); // Clear existing books
+    const Book = mongoose.model('Book');
+    await Book.deleteMany({});
     await Book.create([
       {
         title: 'Book 1',
@@ -40,9 +38,6 @@ bookSchema.statics.seed = async function () {
   }
 };
 
-
-// Define the Book model using the schema
 const Book = mongoose.model('Book', bookSchema);
 
-// Export the Book model
 module.exports = Book;
