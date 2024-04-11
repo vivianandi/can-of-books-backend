@@ -39,6 +39,33 @@ app.use((error, request, response) => {
   response.status(500).json({ message: 'Internal Server Error' });
 });
 
+//Handle PUT
+app.put('/books/:id', async (req, res) => {
+  try {
+    // Extract book ID from request parameters
+    const { id } = req.params;
+
+    // Check if the ID is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid book ID' });
+    }
+
+    // Update the book details in the database
+    const updatedBook = await Books.findByIdAndUpdate(id, req.body, { new: true });
+
+    // If the book was not found, return a 404 response
+    if (!updatedBook) {
+      return res.status(404).json({ message: 'Book not found' });
+    }
+
+    // Return the updated book
+    res.json(updatedBook);
+  } catch (error) {
+    // Handle errors
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Route Handlers
 async function handleGetBooks(request, response) {
   try {
