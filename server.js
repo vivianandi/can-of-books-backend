@@ -7,10 +7,10 @@ const Books = require('./models/books');
 
 const app = express();
 
-//Middleware - enabling your backend server to respond to requests from different origins
+// Middleware - enabling your backend server to respond to requests from different origins
 app.use(cors());
 
-//Middleware - access to body of request
+// Middleware - access to body of request
 app.use(express.json());
 
 // Handle the default route
@@ -18,15 +18,103 @@ app.get('/', (request, response) => {
   response.json({ message: 'This is the book server' });
 });
 
-app.get('/books', handleGetBooks);
-app.get('/books/seed', seedDatabase);
-app.get('/books/nuke', emptyDatabase);
+// Route handler for fetching list of books
+app.get('/books', async (request, response) => {
+  try {
+    // Fetch the list of books from the database
+    const books = await Books.find({});
+    // Send back the list of books as JSON
+    response.json(books);
+  } catch (error) {
+    // If there's an error, send back an error response
+    response.status(500).json({ message: error.message });
+  }
+});
 
-//Route handler - POST - creates a new book
-app.post('/books', handleCreateBook);
+// Route handler for seeding the database with dummy data
+app.get('/books/seed', async (request, response) => {
+  try {
+    // Seed the database with dummy data
+    let results = await Books.seed();
+    response.json({ message: results });
+  } catch (error) {
+    // If there's an error, send back an error response
+    response.status(500).json({ message: error.message });
+  }
+});
 
-//RH - delete
-app.delete('/books/:id', handleDeleteBook);
+// Route handler for clearing the database
+app.get('/books/nuke', async (request, response) => {
+  try {
+    // Clear the database
+    let results = await Books.clear();
+    response.json({ message: results });
+  } catch (error) {
+    // If there's an error, send back an error response
+    response.status(500).json({ message: error.message });
+  }
+});
+
+// Route handler for creating a new book
+app.post('/books', async (request, response) => {
+  try {
+    // Extract title and description from the request body
+    const { title, description } = request.body;
+    // Create a new book in the database
+    const newBook = await Books.create({
+      title,
+      description,
+      status: 'available'
+    });
+    // Send back the newly created book as JSON
+    response.status(201).json(newBook);
+  } catch (error) {
+    // If there's an error, send back an error response
+    response.status(500).json({ message: error.message });
+  }
+});
+
+// Route handler for deleting a book by ID
+app.delete('/books/:id', async (request, response) => {
+  try {
+    // Extract the book ID from the request parameters
+    const { id } = request.params;
+    // Delete the book from the database
+    const deletedBook = await Books.findByIdAndDelete(id);
+    // If the book was not found, send back a 404 response
+    if (!deletedBook) {
+      return response.status(404).json({ message: 'Book not found' });
+    }
+    // Send back a success message
+    response.json({ message: 'Book deleted successfully' });
+  } catch (error) {
+    // If there's an error, send back an error response
+    response.status(500).json({ message: error.message });
+  }
+});
+
+// Route handler for updating a book by ID
+app.put('/books/:id', async (request, response) => {
+  try {
+    // Extract the book ID from the request parameters
+    const { id } = request.params;
+    // Check if the ID is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return response.status(400).json({ message: 'Invalid book ID' });
+    }
+    // Update the book in the database
+    const updatedBook = await Books.findByIdAndUpdate(id, request.body, { new: true });
+    // If the book was not found, send back a 404 response
+    if (!updatedBook) {
+      return response.status(404).json({ message: 'Book not found' });
+    }
+    // Send back the updated book as JSON
+    response.json(updatedBook);
+  } catch (error) {
+    // If there's an error, send back an error response
+    response.status(500).json({ message: error.message });
+  }
+});
 
 // Handle all unknown routes
 app.get('*', (request, response) => {
@@ -39,107 +127,13 @@ app.use((error, request, response) => {
   response.status(500).json({ message: 'Internal Server Error' });
 });
 
-//Handle PUT
-app.put('/books/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid book ID' });
-    }
-
-    const updatedBook = await Books.findByIdAndUpdate(id, req.body, { new: true });
-
-    if (!updatedBook) {
-      return res.status(404).json({ message: 'Book not found' });
-    }
-
-    // Return the updated book
-    res.json(updatedBook);
-  } catch (error) {
-    // Handle errors
-    res.status(500).json({ message: error.message });
-  }
-});
-
-async function handleGetBooks(request, response) {
-  try {
-    const books = await Books.find({});
-    response.json(books);
-  } catch (error) {
-    response.status(500).json({ message: error.message });
-  }
-}
-
-async function seedDatabase(request, response) {
-  try {
-    let results = await Books.seed();
-    response.json({ message: results });
-  } catch (error) {
-    response.status(500).json({ message: error.message });
-  }
-}
-
-async function emptyDatabase(request, response) {
-  try {
-    let results = await Books.clear();
-    response.json({ message: results });
-  } catch (error) {
-    response.status(500).json({ message: error.message });
-  }
-}
-
-//takes book data from the client request (title, desc..), create book in the database, sends resp of book or error
-async function handleCreateBook(request, response) {
-  console.log(request);
-  console.log('response', response);
-  try {
-
-    if (!request.body || !request.body.title || !request.body.description) {
-      return response.status(400).json({ message: 'Title and description are required in the request body' });
-    }
-
-    const { title, description } = request.body;
-
-    const newBook = await Books.create({
-      title,
-      description,
-      status: 'available'
-    });
-
-    response.status(200).json(newBook);
-  } catch (error) {
-    response.status(500).json({ message: error.message });
-  }
-}
-
-async function handleDeleteBook(request, response) {
-  try {
-    const { id } = request.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return response.status(400).json({ message: 'Invalid book ID' });
-    }
-
-    const deletedBook = await Books.findByIdAndDelete(id);
-
-    if (!deletedBook) {
-      return response.status(400).json({ message: 'Book not found' });
-    }
-
-    response.json({ message: 'Book deleted successfully' });
-  } catch (error) {
-    response.status(500).json({ message: error.message });
-  }
-}
-
+// Function to start the server
 function startServer() {
   const PORT = process.env.PORT || 3000;
   const DATABASE_URL = process.env.DATABASE_URL;
 
   console.log(DATABASE_URL);
   mongoose.connect(DATABASE_URL)
-
     .then(() => {
       app.listen(PORT, () => {
         console.log(`Server started on port ${PORT}`);
@@ -150,4 +144,5 @@ function startServer() {
     });
 }
 
+// Start the server
 startServer();
