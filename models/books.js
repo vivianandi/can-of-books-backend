@@ -11,6 +11,16 @@ const bookSchema = new mongoose.Schema({
   }
 });
 
+bookSchema.statics.clear = async function () {
+  try {
+    // Delete all documents from the 'books' collection
+    await this.deleteMany({});
+    return 'Database cleared successfully';
+  } catch (error) {
+    return error.message;
+  }
+};
+
 bookSchema.statics.seed = async function () {
   try {
     const Book = mongoose.model('Book');

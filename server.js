@@ -44,7 +44,10 @@ app.get('/books/seed', async (request, response) => {
 });
 
 // Route handler for clearing the database
-app.get('/books/nuke', async (request, response) => {
+app.get('/books/nuke', emptyDatabase); // Use the emptyDatabase function here
+
+// Implementation of emptyDatabase function
+async function emptyDatabase(request, response) {
   try {
     // Clear the database
     let results = await Books.clear();
@@ -53,7 +56,7 @@ app.get('/books/nuke', async (request, response) => {
     // If there's an error, send back an error response
     response.status(500).json({ message: error.message });
   }
-});
+}
 
 // Route handler for creating a new book
 app.post('/books', async (request, response) => {
